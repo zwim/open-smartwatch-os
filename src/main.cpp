@@ -95,10 +95,16 @@ using OswGlobals::main_tutorialApp;
 #define _MAIN_CRASH_SLEEP 2
 #endif
 
+void hackToChangeUARTClk() {
+        // todo
+}
+
 void setup() {
     Serial.begin(115200);
     OSW_LOG_I("Welcome to the OSW-OS! This build is based on commit ", GIT_COMMIT_HASH, " from ", GIT_BRANCH_NAME,
               ". Compiled at ", __DATE__, " ", __TIME__, " for platform ", PIO_ENV_NAME, ".");
+
+    hackToChangeUARTClk();
 
     // Load config as early as possible, to ensure everyone can access it.
     OswConfig::getInstance()->setup();
@@ -182,6 +188,9 @@ void loop() {
 
     // Now update the screen (this will maybe sleep for a while)
     try {
+        // to use dynamic frequencies you have to change
+        //    uart_config.source_clk  from  UART_SCLK_APB;  to  UART_SCLK_REF_TICK;  in esp32-hal-uart.c in uartBegin(....)
+
         setCpuFrequencyMhz(OSW_PLATFORM_DEFAULT_CPUFREQ);
         OswUI::getInstance()->loop();
         setCpuFrequencyMhz(10);
