@@ -90,16 +90,22 @@
 using OswGlobals::main_mainDrawer;
 using OswGlobals::main_tutorialApp;
 
-#ifndef NDEBUG
+#ifndef NDEBUGn
 #define _MAIN_CRASH_SLEEP 10
 #else
 #define _MAIN_CRASH_SLEEP 2
 #endif
 
+void hackToChangeUARTClk() {
+        // todo
+}
+
 void setup() {
     Serial.begin(115200);
     OSW_LOG_I("Welcome to the OSW-OS! This build is based on commit ", GIT_COMMIT_HASH, " from ", GIT_BRANCH_NAME,
               ". Compiled at ", __DATE__, " ", __TIME__, " for platform ", PIO_ENV_NAME, ".");
+
+    hackToChangeUARTClk();
 
     // Load config as early as possible, to ensure everyone can access it.
     OswConfig::getInstance()->setup();
@@ -131,9 +137,11 @@ void setup() {
 
     // Install drawer and (maybe) jump into tutorial
     OswUI::getInstance()->setRootApplication(&main_mainDrawer);
+/*
     main_tutorialApp.reset(new OswAppTutorial());
     if(!main_tutorialApp->changeRootAppIfNecessary())
         main_tutorialApp.reset(); // no need to keep it around, as it's not the root app
+*/
 
 #if USE_ULP == 1
     // register the ULP program
@@ -179,21 +187,27 @@ void loop() {
         ESP.restart();
     }
 
+
     // Now update the screen (this will maybe sleep for a while)
     try {
+        // to use dynamic frequencies you have to change
+        //    uart_config.source_clk  from  UART_SCLK_APB;  to  UART_SCLK_REF_TICK;  in esp32-hal-uart.c in uartBegin(....)
+
+        setCpuFrequencyMhz(OSW_PLATFORM_DEFAULT_CPUFREQ);
         OswUI::getInstance()->loop();
+        setCpuFrequencyMhz(10);
     } catch(const std::exception& e) {
         OSW_LOG_E("CRITICAL ERROR AT APP: ", e.what());
         sleep(_MAIN_CRASH_SLEEP);
         ESP.restart();
     }
-    if (delayedAppInit) {
-        // fix flickering display on latest Arduino_GFX library
-        ledcWrite(1, OswConfigAllKeys::settingDisplayBrightness.get());
-    }
 
     if (delayedAppInit) {
         delayedAppInit = false;
+
+        // fix flickering display on latest Arduino_GFX library
+        // TODO: check this again
+        ledcWrite(1, OswConfigAllKeys::settingDisplayBrightness.get());
 
         // TODO port all v1 apps to v2, to allow for lazy loading (or let them in compat mode)
 
