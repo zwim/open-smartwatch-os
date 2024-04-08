@@ -68,6 +68,7 @@
 #include "./apps/watchfaces/OswAppWatchfaceBinary.h"
 #include "./apps/watchfaces/OswAppWatchfaceMonotimer.h"
 #include "./apps/watchfaces/OswAppWatchfaceNumerals.h"
+#include "./apps/watchfaces/OswAppWatchfaceFitnessAnalog.h"
 #if OSW_PLATFORM_ENVIRONMENT_MAGNETOMETER == 1 && OSW_PLATFORM_HARDWARE_QMC5883L == 1
 #include "./apps/_experiments/magnetometer_calibrate.h"
 #endif
@@ -95,8 +96,8 @@ using OswGlobals::main_tutorialApp;
 #define _MAIN_CRASH_SLEEP 2
 #endif
 
+#ifndef OSW_EMULATOR
 #include "driver/uart.h"
-
 
 // a helper directly stolen from esp32-hal-uart.c
 static inline uint32_t _get_effective_baudrate(uint32_t baudrate)
@@ -140,6 +141,11 @@ void initSerial(uint32_t baud_rate = 115200) {
 
     ESP_ERROR_CHECK(uart_param_config(uart_num, &uart_config));
 }
+#else
+void initSerial(uint32_t baud_rate = 115200) {
+    Serial.begin(baud_rate);
+}
+#endif
 
 void setup() {
     initSerial(115200);
@@ -168,6 +174,7 @@ void setup() {
     main_mainDrawer.registerAppLazy<OswAppWatchfaceBinary>(LANG_WATCHFACES);
     main_mainDrawer.registerAppLazy<OswAppWatchfaceMonotimer>(LANG_WATCHFACES);
     main_mainDrawer.registerAppLazy<OswAppWatchfaceNumerals>(LANG_WATCHFACES);
+    main_mainDrawer.registerAppLazy<OswAppWatchfaceFitnessAnalog>(LANG_WATCHFACES);
     try {
         main_mainDrawer.startApp(OswConfigAllKeys::settingDisplayDefaultWatchface.get().c_str()); // if this id is invalid, the drawer will fall back to alternatives automatically
     } catch(const std::runtime_error& e) {
@@ -225,7 +232,6 @@ void loop() {
         sleep(_MAIN_CRASH_SLEEP);
         ESP.restart();
     }
-
 
     // Now update the screen (this will maybe sleep for a while)
     try {
