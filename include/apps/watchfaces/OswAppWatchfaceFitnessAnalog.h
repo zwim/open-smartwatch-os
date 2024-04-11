@@ -23,13 +23,7 @@ public:
   void onStop() override;
 
   static uint32_t calculateDistance(uint32_t steps);
-  
-  void timeDisplay(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second);
-  void timeDisplay(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
-  void dateDisplay(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
 
-  void test();
-  
   ~OswAppWatchfaceFitnessAnalog() {}
 
 private:
@@ -39,6 +33,11 @@ private:
   void showFitnessTracking(OswHal *hal);
   void drawWatchFace(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
   void drawDateFace(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
+  void drawFitnessFace(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
+
+  void timeDisplay(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second);
+  void timeDisplay(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
+  void dateDisplay(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);
 
 #ifdef GIF_BG
     OswAppGifPlayer* bgGif = nullptr;
