@@ -1,3 +1,4 @@
+#pragma once
 
 #include "osw_pins.h"
 

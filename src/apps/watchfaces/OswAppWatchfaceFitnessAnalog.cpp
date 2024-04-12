@@ -39,7 +39,6 @@ void OswAppWatchfaceFitnessAnalog::showFitnessTracking(OswHal *hal) {
     uint32_t distTarget = OswConfigAllKeys::distPerDay.get();
 
     uint8_t arcRadius = 6;
-    uint16_t yellow = rgb565(255, 255,0);
 
 #ifdef OSW_EMULATOR
     steps = 4000;
@@ -48,7 +47,7 @@ void OswAppWatchfaceFitnessAnalog::showFitnessTracking(OswHal *hal) {
 
     {   // draw step arc
         int32_t angle_val = 180.0f * (float)min(steps, stepsTarget) / (float)stepsTarget;
-        uint16_t color = yellow;
+        uint16_t color = ui->getWarningColor();
         uint16_t dimmed_color = changeColor(color, 0.25f);
         hal->gfx()->drawCircleAA(CENTER_X, CENTER_Y, 92 +arcRadius, arcRadius*2, dimmed_color, 90, 270-angle_val);
         hal->gfx()->drawCircleAA(CENTER_X, CENTER_Y -92, arcRadius, 0, dimmed_color);
@@ -77,7 +76,7 @@ void OswAppWatchfaceFitnessAnalog::showFitnessTracking(OswHal *hal) {
     hal->gfx()->setTextSize(1);
     hal->gfx()->setTextLeftAligned();
 
-    hal->gfx()->setTextColor(dimColor(yellow, 25));
+    hal->gfx()->setTextColor(dimColor(ui->getWarningColor(), 25));
     hal->gfx()->setTextCursor(CENTER_X + 12, 8+23);
     hal->gfx()->print(steps);
     hal->gfx()->setTextCursor(CENTER_X + 12, DISP_H-23);
@@ -176,10 +175,8 @@ void OswAppWatchfaceFitnessAnalog::drawFitnessFace(OswHal *hal, uint32_t hour, u
 #endif
 
     // Steps
-    uint16_t yellow = rgb565(255, 255,0);
-
     hal->gfx()->setTextSize(3);
-    hal->gfx()->setTextColor(yellow);
+    hal->gfx()->setTextColor(ui->getWarningColor());
     hal->gfx()->setTextLeftAligned();
     hal->gfx()->setTextCursor(CENTER_X - 80, CENTER_Y - 10);
     hal->gfx()->print(LANG_FITNESS_STEP);
@@ -229,6 +226,7 @@ void OswAppWatchfaceFitnessAnalog::onStart() {
 void OswAppWatchfaceFitnessAnalog::onLoop() {
     OswAppV2::onLoop();
 
+printf("xxx onLoop %d\n", (int)millis());
     this->needsRedraw = this->needsRedraw or time(nullptr) != this->lastTime; // redraw every second
 }
 
@@ -240,6 +238,9 @@ void OswAppWatchfaceFitnessAnalog::onDraw() {
 #endif
 
     OswAppV2::onDraw();
+
+printf("xxx onDraw %d\n", (int)millis());
+
 
 #ifdef GIF_BG
     if(this->bgGif != nullptr)
@@ -300,12 +301,14 @@ void OswAppWatchfaceFitnessAnalog::onButton(Button id, bool up, OswAppV2::Button
 
     if(!up) return;
 
+    // Swallow short presses
     if (state == OswAppV2::ButtonStateNames::SHORT_PRESS) {
         if (screen < 3)
             ++screen;
         return;
     }
 
+    // Do only the long press
     if(OswAppWatchface::onButtonDefaults(*this, id, up, state))
         return; // if the button was handled by the defaults, we are done here
 }
