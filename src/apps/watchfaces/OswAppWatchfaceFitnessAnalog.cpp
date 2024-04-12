@@ -55,8 +55,8 @@ void OswAppWatchfaceFitnessAnalog::showFitnessTracking(OswHal *hal) {
 
         hal->gfx()->drawCircleAA(CENTER_X, CENTER_Y, 92 +arcRadius, arcRadius*2, steps > stepsTarget ? dimmed_color : color, 270-angle_val, 270);
         hal->gfx()->drawCircleAA(CENTER_X, CENTER_Y +92, arcRadius, 0, steps > stepsTarget ? dimmed_color : color);
-        int x = CENTER_X + cosf((270-angle_val)*PI/180) * 92.0f -1;
-        int y = CENTER_Y - sinf((270-angle_val)*PI/180) * 92.0f -1;
+        int x = CENTER_X + cosf((270-angle_val)*PI/180) * 92.0f;
+        int y = CENTER_Y - sinf((270-angle_val)*PI/180) * 92.0f;
         hal->gfx()->drawCircleAA(x, y, arcRadius, 0, color);
     }
 
@@ -157,11 +157,6 @@ void OswAppWatchfaceFitnessAnalog::drawDateFace(OswHal *hal, uint32_t hour, uint
     }
 
 #if OSW_PLATFORM_ENVIRONMENT_TEMPERATURE == 1
-/*
-    printStatus("Temperature", String(hal->environment()->getTemperature() + String("C")).c_str());
-    for(auto& d : *OswTemperatureProvider::getAllTemperatureDevices())
-        printStatus((String("  ") + d->getName()).c_str(), String(d->getTemperature() + String("C")).c_str());
-*/
     hal->gfx()->setTextSize(2);
     hal->gfx()->setTextLeftAligned();
     hal->gfx()->setTextCursor(DISP_W * 0.2f, DISP_H * 0.2f);
@@ -297,6 +292,7 @@ void OswAppWatchfaceFitnessAnalog::onDraw() {
 #else
     unsigned long ms_for_onDraw = millis()-old_millis;
 #endif
+    OSW_LOG_I("Time to draw ", ms_for_onDraw, " ms");
 }
 
 void OswAppWatchfaceFitnessAnalog::onButton(Button id, bool up, OswAppV2::ButtonStateNames state) {
