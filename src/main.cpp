@@ -102,9 +102,9 @@ using OswGlobals::main_tutorialApp;
 // a helper directly stolen from esp32-hal-uart.c
 static inline uint32_t _get_effective_baudrate(uint32_t baudrate)
 {
-    uint32_t Freq = getApbFrequency()/1000000;
-    if (Freq < 80) {
-        return 80 / Freq * baudrate;
+    uint32_t Freq = getApbFrequency();
+    if (Freq < 80000000) {
+        return 80000000.0 / Freq * baudrate;
      }
     else {
         return baudrate;
@@ -202,23 +202,27 @@ void loop() {
     static time_t nextTimezoneUpdate = time(nullptr) + 60; // Already done after sleep -> revisit in a while
     static bool delayedAppInit = true;
 
+    bool wifiDisabled = true;
+
 // check possible interaction with ULP program
 #if USE_ULP == 1
     loop_ulp();
 #endif
 
-    bool wifiDisabled = true;
-
     try {
         OswHal::getInstance()->handleDisplayTimout();
         OswHal::getInstance()->handleWakeupFromLightSleep();
-        OswHal::getInstance()->checkButtons();
+        if (OswHal::getInstance()->checkButtons()) {
+            // Update screen as soon as possible
+            OswUI::getInstance()->getRootApplication()->setNeedsRedraw();
+        }
         OswHal::getInstance()->devices()->update();
         // update power statistics only when WiFi isn't used - fixing:
         // https://github.com/Open-Smartwatch/open-smartwatch-os/issues/163
 #ifdef OSW_FEATURE_WIFI
         wifiDisabled = !OswServiceAllTasks::wifi.isEnabled();
 #endif
+
         if (time(nullptr) > lastPowerUpdate and wifiDisabled) {
             // Only update those every second
             OswHal::getInstance()->updatePowerStatistics(OswHal::getInstance()->getBatteryRaw(20));
@@ -242,6 +246,7 @@ void loop() {
         if (wifiDisabled)
             setCpuFrequencyMhz(OSW_PLATFORM_DEFAULT_CPUFREQ);
 
+        // Call the onLoop() and onDraw() methods of the app if necessary
         OswUI::getInstance()->loop();
 
         if (wifiDisabled)
