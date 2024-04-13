@@ -29,6 +29,7 @@ public:
 private:
   time_t lastTime = 0;
   unsigned screen = 0;
+  unsigned long lastShortPressTime = 0;
 
   void showFitnessTracking(OswHal *hal);
   void drawWatchFace(OswHal *hal, uint32_t hour, uint32_t minute, uint32_t second, bool afterNoon);

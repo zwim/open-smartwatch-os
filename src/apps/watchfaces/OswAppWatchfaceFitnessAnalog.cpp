@@ -221,12 +221,13 @@ void OswAppWatchfaceFitnessAnalog::onStart() {
     this->bgGif->setup();
 #endif
 
+    this->viewFlags = (OswAppV2::ViewFlags)(this->viewFlags | OswAppV2::ViewFlags::NO_FPS_LIMIT ); // this causes draw() to be called upon every loop() call -> preventing the loss of input events (like the button just went down)
+    // Listen to ALL the typical button events (while not processed, it allows animations to be shown for them)
 }
 
 void OswAppWatchfaceFitnessAnalog::onLoop() {
     OswAppV2::onLoop();
 
-printf("xxx onLoop %d\n", (int)millis());
     this->needsRedraw = this->needsRedraw or time(nullptr) != this->lastTime; // redraw every second
 }
 
@@ -238,9 +239,6 @@ void OswAppWatchfaceFitnessAnalog::onDraw() {
 #endif
 
     OswAppV2::onDraw();
-
-printf("xxx onDraw %d\n", (int)millis());
-
 
 #ifdef GIF_BG
     if(this->bgGif != nullptr)
@@ -255,6 +253,10 @@ printf("xxx onDraw %d\n", (int)millis());
     bool afterNoon;
     hal->getLocalTime(&hour, &minute, &second, &afterNoon);
 
+    if (screen > 0 && millis() - lastShortPressTime > 5000) {
+        screen = 0;
+    }
+
     if (screen == 0) {
         #if OSW_PLATFORM_ENVIRONMENT_ACCELEROMETER == 1
             showFitnessTracking(hal);
@@ -264,27 +266,13 @@ printf("xxx onDraw %d\n", (int)millis());
     } else if (screen == 1) {
         drawDateFace(hal, hour, minute, second, afterNoon);
 
-        static int wait_time = 5;
-        if (wait_time >= 0)
-            --wait_time;
-        else {
-            screen = 0;
-            wait_time = 5;
-        }
     } else if (screen == 2) {
         drawFitnessFace(hal, hour, minute, second, afterNoon);
-
-        static int wait_time = 5;
-        if (wait_time >= 0)
-            --wait_time;
-        else {
-            screen = 0;
-            wait_time = 5;
-        }
-    } else if (screen == 3) {
+    } else {
         screen = 0;
-        onDraw();
     }
+
+
 
     this->lastTime = time(nullptr);
 
@@ -293,7 +281,7 @@ printf("xxx onDraw %d\n", (int)millis());
 #else
     unsigned long ms_for_onDraw = millis()-old_millis;
 #endif
-    OSW_LOG_I("Time to draw ", ms_for_onDraw, " ms");
+//    OSW_LOG_I("Time to draw ", ms_for_onDraw, " ms");
 }
 
 void OswAppWatchfaceFitnessAnalog::onButton(Button id, bool up, OswAppV2::ButtonStateNames state) {
@@ -301,10 +289,12 @@ void OswAppWatchfaceFitnessAnalog::onButton(Button id, bool up, OswAppV2::Button
 
     if(!up) return;
 
-    // Swallow short presses
+    // Process short presses
     if (state == OswAppV2::ButtonStateNames::SHORT_PRESS) {
-        if (screen < 3)
+        if (screen < 3) {
             ++screen;
+            lastShortPressTime = millis();
+        }
         return;
     }
 
