@@ -4,8 +4,9 @@
 ** See Copyright Notice in lua.h
 */
 
-
 #ifdef OSW_FEATURE_LUA
+
+#include "Arduino.h"
 
 #define linit_c
 #define LUA_LIB
@@ -62,13 +63,46 @@ static const luaL_Reg loadedlibs[] = {
     {NULL, NULL}
 };
 
-
+/*
 LUALIB_API void luaL_openlibs (lua_State* L) {
     const luaL_Reg* lib;
-    /* "require" functions from 'loadedlibs' and set results to global table */
+    // "require" functions from 'loadedlibs' and set results to global table 
     for (lib = loadedlibs; lib->func; lib++) {
         luaL_requiref(L, lib->name, lib->func, 1);
-        lua_pop(L, 1);  /* remove lib */
+        lua_pop(L, 1);  // remove lib 
+    }
+}
+*/
+
+void printLuaStack(lua_State *L) {
+    int top = lua_gettop(L);
+
+    printf("From top to bottom, the lua stack is\n");
+    for (unsigned index = top; index > 0; index--)
+    {
+        int type = lua_type(L, index);
+        switch (type)
+        {
+            // booleans
+            case LUA_TBOOLEAN:
+                printf("%s\n", lua_toboolean(L, index) ? "true" : "false");
+                break;
+
+            // numbers
+            case LUA_TNUMBER:
+                printf("%f\n", lua_tonumber(L, index));
+                break;
+
+        // strings
+            case LUA_TSTRING:
+                printf("%s\n", lua_tostring(L, index));
+                break;
+
+            // other
+            default:
+                printf("%s\n", lua_typename(L, type));
+                break;
+        }
     }
 }
 #endif

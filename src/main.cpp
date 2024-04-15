@@ -46,6 +46,7 @@
 #include "assets/img/icons/calculator.png.h"
 #include "./apps/tools/OswAppCalculator.h"
 #include "./apps/tools/OswAppFlashLight.h"
+#include "./apps/tools/OswAppTwilightLua.h"
 #include "./apps/tools/button_test.h"
 #ifndef NDEBUG
 #include "./apps/tools/OswAppPrintDebug.h"
@@ -278,6 +279,8 @@ void loop() {
 #ifdef OSW_FEATURE_LUA
         static OswLuaApp luaApp("stopwatch.lua");
         main_mainDrawer.registerApp("LUA", new OswAppV2Compat("osw.lua", "Demo", luaApp));
+        static OswAppTwilightLua twilightLua;
+        main_mainDrawer.registerApp(LANG_TOOLS, &twilightLua);
 #endif
     }
 

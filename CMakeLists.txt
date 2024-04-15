@@ -111,6 +111,7 @@ target_include_directories(emulator.run PUBLIC
     emulator/lib/Jzon/
     ${SDL2_INCLUDE_DIRS}
     ${SDL2IMAGE_INCLUDE_DIRS}
+    ./lib/LUA
 )
 target_link_libraries(emulator.run LINK_PUBLIC
     Pngle
@@ -141,6 +142,7 @@ target_compile_definitions(emulator.run PUBLIC
     # LOCALE="locales/en-US.h"
     # Comment these as you wish...
     OSW_FEATURE_STATS_STEPS
+    OSW_FEATURE_LUA
     OSW_APPS_EXAMPLES=1
     GAME_SNAKE=1
     GAME_BRICK_BREAKER=1
