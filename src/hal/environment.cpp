@@ -114,6 +114,7 @@ void OswHal::Environment::setupStepStatistics() {
     this->_stepsSum = prefs.getUInt(PREFS_STEPS_ALL);
     this->_stepsLastDoW = prefs.getUInt(PREFS_STEPS_DAYLASTCHECKED);
     prefs.end(); // Make sure to close now, as the commit-function may open one instance itself
+    Serial.printf("xxx hal commitStepStat\n"); Serial.flush();
     this->commitStepStatistics(true);
 }
 
@@ -128,6 +129,7 @@ void OswHal::Environment::commitStepStatistics(const bool& alwaysPrintStepStatis
     uint32_t currDoW = 0;
     OswHal::getInstance()->getLocalDate(&currDoM, &currDoW);
     bool changedDoW = currDoW != this->_stepsLastDoW;
+    Serial.printf("xxx comitStepStat curDoW %d, _stepLastDow %d, %d\n", currDoW, _stepsLastDoW, changedDoW); Serial.flush();
     if(changedDoW) {
         Preferences prefs;
         bool res = prefs.begin(PREFS_STEPS, false); // Open in RW, just in case
