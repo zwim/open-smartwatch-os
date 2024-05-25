@@ -234,31 +234,42 @@ class Graphics2D {
     void drawRFrame(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t r, uint16_t color);
     void fillRFrame(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t r, uint16_t color);
 
-    inline void drawTick(int16_t cx, int16_t cy, int16_t r1, int16_t r2, float angle, uint16_t color) {
-        drawLine(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
+    inline void drawTick(int16_t cx, int16_t cy, int16_t r1, int16_t r2, float angle, uint16_t color, bool anti_alias = false) {
+        if (anti_alias)
+            drawLineAA(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
+        else
+            drawLine(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
     }
 
-    inline void drawTick(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int angle, uint16_t color) {
-        drawLine(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
+    inline void drawTick(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int angle, uint16_t color, bool anti_alias = false) {
+        if (anti_alias)
+            drawLineAA(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
+        else
+            drawLine(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
     }
 
+    // deprecated use drawTick(....., true)
+    // will be deleted very soon
     inline void drawTickAA(int16_t cx, int16_t cy, int16_t r1, int16_t r2, float angle, uint16_t color) {
         drawLineAA(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
     }
 
+    // deprecated use drawTick(....., true)
+    // will be deleted very soon
     inline void drawTickAA(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int32_t angle, uint16_t color) {
         drawLineAA(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), color);
     }
 
 
     inline void drawThickTick(int16_t cx, int16_t cy, int16_t r1, int16_t r2, float angle, int16_t radius, uint16_t color,
-                              bool highQuality = false, LINE_END_OPT eol = ROUND_END) {
-        if (highQuality)
+                              bool anti_alias = false, LINE_END_OPT eol = ROUND_END) {
+        if (anti_alias)
             drawThickLineAA(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), radius, color, eol);
         else
-            drawThickLine(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), radius, color,
-                          highQuality);
+            drawThickLine(rpx(cx, r1, angle), rpy(cy, r1, angle), rpx(cx, r2, angle), rpy(cy, r2, angle), radius, color, false);
     }
+
+    void drawNTicks(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int16_t nTicks, uint16_t color, int16_t skip_every_nth = 361, bool anti_alias = true);
 
     void drawNTicks(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int16_t nTicks, uint16_t color, int16_t skip_every_nth = 361);
     void drawNTicksAA(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int16_t nTicks, uint16_t color, int16_t skip_every_nth = 361);
@@ -278,7 +289,7 @@ class Graphics2D {
         if (anti_alias)
             drawNTicksAA(cx, cy, r1, r2, 12, color);
         else
-            drawNTicks(cx, cy, r1, r2, 12, color);
+            drawNTicks(cx, cy, r1, r2, 12, color, 361, false);
     }
 
     /**
@@ -296,7 +307,7 @@ class Graphics2D {
         if (anti_alias)
             drawNTicksAA(cx, cy, r1, r2, 60, color, 5);
         else
-            drawNTicks(cx, cy, r1, r2, 60, color, 5);
+            drawNTicks(cx, cy, r1, r2, 60, color, 5, false);
     }
 
     inline void drawArc(int16_t x, int16_t y, int16_t r1, int16_t r2, float start, float end, uint16_t color, bool anti_alias = true) {

@@ -1353,6 +1353,25 @@ void Graphics2D::fillRFrame(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint
  * @param r2 radius from the end of the tick.
  * @param nTicks number of ticks to draw
  * @param color color code
+ * @param anti_alias do the anti alias magic
+ */
+void Graphics2D::drawNTicks(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int16_t nTicks, uint16_t color, int16_t skip_every_nth, bool anti_alias) {
+    if (anti_alias)
+        drawNTicksAA(cx, cy, r1, r2, nTicks, color, skip_every_nth);
+    else
+        drawNTicks(cx, cy, r1, r2, nTicks, color, skip_every_nth, false);
+}
+
+
+/**
+ * @brief Draw N ticks around the clock to visualize the hours.
+ *
+ * @param cx center x axis
+ * @param cy center y axis
+ * @param r1 radius from the begin of the tick.
+ * @param r2 radius from the end of the tick.
+ * @param nTicks number of ticks to draw
+ * @param color color code
  */
 void Graphics2D::drawNTicks(int16_t cx, int16_t cy, int16_t r1, int16_t r2, int16_t nTicks, uint16_t color, int16_t skip_every_nth) {
     if (360 % nTicks != 0) {
