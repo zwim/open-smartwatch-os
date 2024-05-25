@@ -22,8 +22,8 @@ const char* OswAppWatchfaceNumerals::getAppName() {
 void OswAppWatchfaceNumerals::drawWatch() {
     OswHal* hal = OswHal::getInstance();
 
-    hal->gfx()->drawMinuteTicks(DISP_W / 2, DISP_H / 2, 116, 112, ui->getForegroundDimmedColor());
-    hal->gfx()->drawHourTicks(DISP_W / 2, DISP_H / 2, 117, 107, ui->getForegroundColor());
+    hal->gfx()->drawMinuteTicks(DISP_W / 2, DISP_H / 2, 116, 112, ui->getForegroundDimmedColor(), true);
+    hal->gfx()->drawHourTicks(DISP_W / 2, DISP_H / 2, 117, 107, ui->getForegroundColor(), true);
 
     // hour labels
     hal->gfx()->setTextSize(1);
@@ -72,23 +72,23 @@ void OswAppWatchfaceNumerals::drawWatch() {
         hal->getDualTime(&dualHour, &dualMinute, &dualSecond);
 
         // dual-hours
-        hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 360.0f / 12.0f * (dualHour + dualMinute / 60.0f), 2, ui->getBackgroundDimmedColor());
-        hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 16, 60, 360.0f / 12.0f * (dualHour + dualMinute / 60.0f), 5, ui->getBackgroundDimmedColor());
+        hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 360.0f / 12.0f * (dualHour + dualMinute / 60.0f), 2, ui->getBackgroundDimmedColor(), true, STRAIGHT_END);
+        hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 16, 60, 360.0f / 12.0f * (dualHour + dualMinute / 60.0f), 5, ui->getBackgroundDimmedColor(), true );
     }
 
     // hours
-    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 360.0f / 12.0f * (hour + minute / 60.0f), 1, ui->getForegroundColor());
-    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 16, 60, 360.0f / 12.0f * (hour + minute / 60.0f), 4, ui->getForegroundColor());
+    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 360.0f / 12.0f * (hour + minute / 60.0f), 1, ui->getForegroundColor(), true, STRAIGHT_END);
+    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 16, 60, 360.0f / 12.0f * (hour + minute / 60.0f), 4, ui->getForegroundColor(), true);
 
     // minutes
-    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 360.0f / 60.0f * (minute + second / 60.0f), 1, ui->getForegroundColor());
-    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 16, 80, 360.0f / 60.0f * (minute + second / 60.0f), 4, ui->getForegroundColor());
+    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 360.0f / 60.0f * (minute + second / 60.0f), 1, ui->getForegroundColor(), true, STRAIGHT_END);
+    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 16, 80, 360.0f / 60.0f * (minute + second / 60.0f), 4, ui->getForegroundColor(), true);
 
 #ifndef GIF_BG
     // seconds
-    hal->gfx()->fillCircle(DISP_W / 2, DISP_H / 2, 3, ui->getDangerColor());
-    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 180 + ( 360.0f / 60.0f * second ), 1, ui->getDangerColor());
-    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 105, 360.0f / 60.0f * second, 1, ui->getDangerColor());
+    hal->gfx()->fillCircleAA(DISP_W / 2, DISP_H / 2, 3, ui->getDangerColor());
+    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 16, 180 + ( 360.0f / 60.0f * second ), 1, ui->getDangerColor(), true, STRAIGHT_END);
+    hal->gfx()->drawThickTick(DISP_W / 2, DISP_H / 2, 0, 105, 360.0f / 60.0f * second, 1, ui->getDangerColor(), true);
 #endif
 }
 
@@ -115,4 +115,11 @@ void OswAppWatchfaceNumerals::onButton(Button id, bool up, OswAppV2::ButtonState
     OswAppV2::onButton(id, up, state);
     if(OswAppWatchface::onButtonDefaults(*this, id, up, state))
         return; // if the button was handled by the defaults, we are done here
+}
+
+void OswAppWatchfaceNumerals::onStop() {
+    OswAppV2::onStop();
+    OswHal* hal = OswHal::getInstance();
+
+    hal->gfx()->clearFont();
 }

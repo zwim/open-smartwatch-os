@@ -15,6 +15,7 @@ class OswAppWatchfaceNumerals : public OswAppV2 {
     void onStart() override;
     void onLoop() override;
     void onDraw() override;
+    void onStop() override;
     void onButton(Button id, bool up, ButtonStateNames state) override;
   private:
     time_t lastTime = 0;

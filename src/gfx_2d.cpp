@@ -819,9 +819,8 @@ bool Graphics2D::isPixelMaskedByAngles(int32_t x, int32_t y) {
     return false;
 }
 
-
 /**
- * @brief Draw an anti-aliased circle with thicknes
+ * @brief Draw an anti-aliased circle with thickness
  *
  * @param x0 x-axis of the center of the circle
  * @param y0 y-axis of the center of the circle

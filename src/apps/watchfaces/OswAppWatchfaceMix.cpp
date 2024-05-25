@@ -24,28 +24,30 @@ const char* OswAppWatchfaceMix::getAppName() {
 void OswAppWatchfaceMix::analogWatchDisplay() {
     OswHal* hal = OswHal::getInstance();
     uint32_t second = 0;
-    uint32_t minute = 0;  // Unused, but required by function signature
-    uint32_t hour = 0;    // Unused, but required by function signature
+    uint32_t minute = 0;
+    uint32_t hour = 0;
 
     hal->getLocalTime(&hour, &minute, &second);
-    hal->gfx()->drawCircle((int)(DISP_W*0.5)-OFF_SET_ANALOG_WATCH_X_COORD, 100, 50, ui->getForegroundColor());
-    hal->gfx()->drawHourTicks((int)(DISP_W*0.5)-OFF_SET_ANALOG_WATCH_X_COORD, 100, 45, 40, ui->getForegroundDimmedColor());
+    hal->gfx()->drawCircleAA((DISP_W/2)-OFF_SET_ANALOG_WATCH_X_COORD, 100, 50, 1, ui->getForegroundColor());
+    hal->gfx()->drawHourTicks((DISP_W/2)-OFF_SET_ANALOG_WATCH_X_COORD, 100, 45, 40, ui->getForegroundDimmedColor(), true);
 
     // hour
-    hal->gfx()->drawLine(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
-                         rpx(DISP_W/3-OFF_SET_ANALOG_WATCH_X_COORD, 33 / 2, (int32_t) (hour * 30 + minute/10 * 6)),
-                         rpy(100, 33 / 2, (int32_t)(hour * 30 + minute/10 * 6)), ui->getForegroundColor());
+    hal->gfx()->drawLineAA(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
+                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 33/2, -(int32_t)(hour * 15 + minute * 6 / 10)),
+                         rpy(100, 33/2, -(int32_t)(hour * 15 + minute * 6 / 10)), ui->getForegroundColor());
+
     // minute
-    hal->gfx()->drawLine(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
-                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 66 / 2, (int32_t) minute * 6),
-                         rpy(100, 66 / 2,  (int32_t)(minute * 6)), ui->getSuccessColor());
+    hal->gfx()->drawLineAA(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
+                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 66/2, -(int32_t)(minute * 6 + second * 6 / 60)),
+                         rpy(100, 66/2, -(int32_t)(minute * 6 + second * 6 / 60)), ui->getSuccessColor());
+
     // second
-    hal->gfx()->drawLine(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
-                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 15 / 2, s2d(second) + 180),
-                         rpy(100, (int)(15 * 0.5f), s2d(second) + 180), ui->getDangerColor());  // short backwards
-    hal->gfx()->drawLine(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
-                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 90 / 2, s2d(second)),
-                         rpy(100, (int)(90 * 0.5f), s2d(second)), ui->getDangerColor());  // long front
+    hal->gfx()->drawLineAA(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
+                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 90/2, -(int32_t)(s2d(second))),
+                         rpy(100, 90/2, -(int32_t)( s2d(second))), ui->getDangerColor());  // long front
+    hal->gfx()->drawLineAA(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 100,
+                         rpx(DISP_W/2-OFF_SET_ANALOG_WATCH_X_COORD, 15 / 2, -(int32_t)(s2d(second)) + 180),
+                         rpy(100, 15/2, -(int32_t)(s2d(second)) + 180), ui->getDangerColor());  // short backwards
 }
 
 void OswAppWatchfaceMix::dateDisplay() {
